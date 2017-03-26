@@ -4,9 +4,20 @@ const Koa = require('koa');
 const app = new Koa();
 const Joi = router.Joi;
 const public = router();
+const VERIFY_TOKEN = "mushroom_to_grow";
 
 public.get('/', async(ctx) => {
     ctx.body = "Hello Router";
+});
+public.get('/fbwebhook', async(ctx) => {
+    if (req.query['hub.mode'] === 'subscribe' &&
+        req.query['hub.verify_token'] === VERIFY_TOKEN) {
+        console.log("Validating webhook");
+        res.status(200).send(req.query['hub.challenge']);
+    } else {
+        console.error("Failed validation. Make sure the validation tokens match.");
+        res.sendStatus(403);
+    }
 });
 app.use(logger());
 app.use(public.middleware());
