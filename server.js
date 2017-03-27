@@ -10,14 +10,17 @@ public.get('/', async(ctx) => {
     ctx.body = "Hello Router";
 });
 public.get('/fbwebhook', async(ctx) => {
-    if (req.query['hub.mode'] === 'subscribe' &&
-        req.query['hub.verify_token'] === VERIFY_TOKEN) {
+    if (ctx.query['hub.mode'] === 'subscribe' &&
+        ctx.query['hub.verify_token'] === VERIFY_TOKEN) {
         console.log("Validating webhook");
-        res.status(200).send(req.query['hub.challenge']);
+        ctx.status = 200;
+        ctx.message = ctx.query['hub.challenge'];
     } else {
         console.error("Failed validation. Make sure the validation tokens match.");
-        res.sendStatus(403);
+        ctx.status = 404;
+
     }
+    return;
 });
 app.use(logger());
 app.use(public.middleware());
